@@ -1,0 +1,22 @@
+﻿@model Product
+
+<h2>Добавить</h2>
+
+<form asp-controller="Product" asp-action="Add" method="post">
+    <div>
+        <label>Имя:</label>
+        <input type="text" asp-for="Name" >
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div>
+        <label>Цена:</label>
+        <input type="text"  asp-for="Price" >
+        <span asp-validation-for="Price" class="text-danger"></span>
+    </div>
+    <div>
+        <label>Вес:</label>
+        <input type="text"  asp-for="Weight" >
+        <span asp-validation-for="Weight" class="text-danger"></span>
+    </div>
+    <button type="submit">Добавить</button>
+</form>
