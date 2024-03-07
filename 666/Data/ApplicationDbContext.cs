@@ -9,6 +9,5 @@ public class ApplicationDbContext : DbContext
     {
     }
 
-    // DbSet для каждой сущности в вашей базе данных
     public DbSet<Product> Products { get; set; }
 }
