@@ -1,36 +1,50 @@
 ﻿@model List<Product>
+@if (User.Identity.IsAuthenticated){
 
-<table class="table table-striped">
-    <thead class="thead-dark">
+
+    <table class="table table-striped">
+        <thead class="thead-dark">
         <tr>
             <th>Имя</th>
             <th>Цена (руб.)</th>
             <th>Вес (кг)</th>
             <th></th>
             <th></th>
-            <th></th>
+            @if (User.IsInRole("2")){
+            <th> <a class="navbar-brand" asp-area="" asp-controller="Product" asp-action="Add">Добавить</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button></th>
+            }
         </tr>
-    </thead>
-    <tbody>
-        @foreach(var obj in Model)
-        {
+        </thead>
+        <tbody>
+        @foreach (var obj in Model){
+        
             <tr>
                 <td>@obj.Name</td>
                 <td>@obj.Price</td>
                 <td>@obj.Weight</td>
+              @if (User.IsInRole("2")) {
                 <td>
                     <a class="btn btn-sm btn-info" asp-controller="Product" asp-action="Edit" asp-route-id="@obj.Id">Изменить</a>
                 </td>
+                }
                 <td>
                     <a class="btn btn-sm btn-secondary" asp-controller="Product" asp-action="Details" asp-route-id="@obj.Id">Подробнее</a>
                 </td>
-                <td>
-                    <form asp-route-id="@obj.Id" asp-action="Delete" asp-controller="Product" method="post" >
-                        <button type="submit" class="btn btn-sm btn-danger">Удалить</button>
-                    </form>
-                </td>
-               
+                 @if (User.IsInRole("2")){
+                
+                    <td>
+                        <form asp-route-id="@obj.Id" asp-action="Delete" asp-controller="Product" method="post">
+                            <button type="submit" class="btn btn-sm btn-danger">Удалить</button>
+                        </form>
+                    </td>
+                }
+
             </tr>
         }
-    </tbody>
-</table>
+        </tbody>
+    </table>
+}

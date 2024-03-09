@@ -1,6 +1,7 @@
 ﻿
 using _666.Data;
 using _666.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,12 +16,13 @@ public class ProductController : Controller
         _db = db;
     }
 
+    
     public IActionResult Index()
     {
         var ProductsList = _db.Products.ToList();
         return View(ProductsList);
     }
-
+    [Authorize]
     public IActionResult Add()
     {
         return View();
@@ -39,7 +41,7 @@ public class ProductController : Controller
 
         return View(product);
     }
-
+    [Authorize]
     public IActionResult Edit(int? id)
     {
         var product = _db.Products.FirstOrDefault(u => u.Id == id);
@@ -66,7 +68,7 @@ public class ProductController : Controller
         }
         return View(product);
     }
-
+    [Authorize]
     public IActionResult Details(int? id)
     {
         var product = _db.Products.FirstOrDefault(u => u.Id == id);
