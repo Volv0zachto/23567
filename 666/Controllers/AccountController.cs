@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace _666.Controllers;
 
@@ -28,14 +29,14 @@ public class AccountController : Controller
     {
         if (ModelState.IsValid)
         {
-            var user = _db.Users.FirstOrDefault(x => x.Login == model.Login);
+            var user = _db.Users.Include(y => y.Role).FirstOrDefault(x => x.Login == model.Login);
             if (user == null)
             {
                 user = new User()
                 {
                     Login = model.Login,
                     Password = model.Password,
-                    Role = 1,
+                    Role = _db.Roles.FirstOrDefault(x=> x.Title == "User" ),
                 };
                 _db.Users.Add(user);
                 _db.SaveChanges();
@@ -68,7 +69,8 @@ public class AccountController : Controller
     {
         if (ModelState.IsValid)
         {
-            var user = _db.Users.FirstOrDefault(x => x.Login == model.Login);
+            var user = _db.Users.Include(y => y.Role).FirstOrDefault(x => x.Login == model.Login);
+           
             if (user != null)
             {
                 if ((user.Password == model.Password))
@@ -103,7 +105,7 @@ public class AccountController : Controller
         var claims = new List<Claim>()
         {
             new Claim(ClaimsIdentity.DefaultNameClaimType, account.Login),
-            new Claim(ClaimsIdentity.DefaultRoleClaimType, account.Role.ToString())
+            new Claim(ClaimsIdentity.DefaultRoleClaimType, account.Role.Title)
         };
        
         return new ClaimsIdentity(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
