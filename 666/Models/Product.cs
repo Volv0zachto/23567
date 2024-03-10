@@ -8,6 +8,7 @@ public class Product
     public int Id { get; set; }
 
     [Required(ErrorMessage = "Введите имя")]
+    
     public string Name { get; set; }
 
     [Required(ErrorMessage = "Введите цену")]
@@ -17,4 +18,5 @@ public class Product
     [Required(ErrorMessage = "Введите вес")]
     [Range(0.1, double.MaxValue, ErrorMessage = "Введите положительное число")]
     public decimal? Weight { get; set; }
+    public Category Category { get; set; }
 }

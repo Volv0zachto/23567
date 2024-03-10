@@ -15,12 +15,37 @@ public class ProductController : Controller
     {
         _db = db;
     }
+    [HttpPost]
+    public IActionResult Index(string? Title)
+    {
+        IQueryable<Product> productsQuery = _db.Products;
 
-    
+        if (Title!= null)
+        {
+            productsQuery = productsQuery.Where(p => p.Category.Title == Title);
+        }
+        else
+        {
+            productsQuery = _db.Products;
+        }
+
+        var HomePage = new HomePageView()
+        {
+            Categories = _db.Categories.ToList(),
+            Products = productsQuery.ToList()
+        };
+        return View(HomePage);;
+    }
+
+    [HttpGet]
     public IActionResult Index()
     {
-        var ProductsList = _db.Products.ToList();
-        return View(ProductsList);
+        var HomePage = new HomePageView()
+        {
+            Categories = _db.Categories.ToList(),
+            Products = _db.Products.ToList()
+        };
+        return View(HomePage);
     }
     [Authorize]
     public IActionResult Add()
@@ -30,11 +55,26 @@ public class ProductController : Controller
 
     [HttpPost]
 
-    public IActionResult Add(Product product)
+    public IActionResult Add(ProductViewModel product)
     {
         if (ModelState.IsValid)
         {
-            _db.Products.Add(product);
+            var category = _db.Categories.FirstOrDefault(x => x.Title == product.Category);
+            if (category == null)
+            {
+                category = new Category() { Title = product.Category };
+                _db.Categories.Add(category);
+                _db.SaveChanges();
+            }
+
+            var newProduct = new Product()
+            {
+                Name = product.Name,
+                Price = product.Price,
+                Weight = product.Weight,
+                Category = category 
+            };
+            _db.Products.Add(newProduct);
             _db.SaveChanges();
             return RedirectToAction("Index");
         }
@@ -42,12 +82,21 @@ public class ProductController : Controller
         return View(product);
     }
     [Authorize]
-    public IActionResult Edit(int? id)
+    public IActionResult Edit(int id)
     {
-        var product = _db.Products.FirstOrDefault(u => u.Id == id);
-        return View(product);
+        var product = _db.Products.Include(x=>x.Category).FirstOrDefault(u => u.Id == id);
+        var newProduct = new ProductViewModel()
+        {
+            Name = product.Name,
+            Price = product.Price,
+            Weight = product.Weight,
+            Category = product.Category.Title ,
+            Id = id
+        }; 
+        
+        return View(newProduct);
     }
-    [HttpPost("Delete")]
+    [HttpPost]
     public IActionResult Delete(int id)
     {
         var product = _db.Products.FirstOrDefault(u => u.Id == id);
@@ -58,20 +107,33 @@ public class ProductController : Controller
 
     
     [HttpPost]
-    public IActionResult Edit(Product product)
+    public IActionResult Edit(ProductViewModel viewModel)
     {
+        
         if (ModelState.IsValid)
         {
-            _db.Products.Update(product);
+            var product = _db.Products.Include(u=>u.Category).FirstOrDefault(x => x.Category.Title == viewModel.Category);
+
+            if (product == null)
+            {
+                _db.Categories.Add(new Category(){Title = viewModel.Category});
+            }
+            product = _db.Products.FirstOrDefault(x => x.Id == viewModel.Id);
+
+                product.Name = viewModel.Name;
+                product.Price = viewModel.Price;
+                product.Weight = viewModel.Weight;
+                product.Category = new Category() { Title = viewModel.Category };
             _db.SaveChanges();
             return RedirectToAction("Index");
         }
-        return View(product);
+        return View(viewModel);
     }
     [Authorize]
     public IActionResult Details(int? id)
     {
-        var product = _db.Products.FirstOrDefault(u => u.Id == id);
+        var product = _db.Products.Include(x => x.Category).FirstOrDefault(u => u.Id == id);
+        
         return View(product);
     }
 

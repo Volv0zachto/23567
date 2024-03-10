@@ -1,9 +1,10 @@
 ﻿@model Product
 <div class="row">
-    <div class="col-md-8 mx-auto" >
-        <h1 class="text-center">@Model.Name </h1>
+    <div class="col-md-8 mx-auto">
+        <h1 class="text-center">@Model.Category.Title </h1>
+        <h2 class="text-center">@Model.Name </h2>
         <h3 class="text-center">@Model.Price rub</h3>
-        <h3 class="text-center">@Model.Weight kg</h3>
-        
+        <h4 class="text-center">@Model.Weight kg</h4>
+
     </div>
 </div>

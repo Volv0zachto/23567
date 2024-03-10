@@ -29,7 +29,7 @@ public class AccountController : Controller
     {
         if (ModelState.IsValid)
         {
-            var user = _db.Users.Include(y => y.Role).FirstOrDefault(x => x.Login == model.Login);
+            var user = _db.Users.FirstOrDefault(x => x.Login == model.Login);
             if (user == null)
             {
                 user = new User()
