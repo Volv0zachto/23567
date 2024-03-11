@@ -4,6 +4,7 @@ using _666.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace _666.Controllers;
 
@@ -29,9 +30,12 @@ public class ProductController : Controller
             productsQuery = _db.Products;
         }
 
+        
         var HomePage = new HomePageView()
         {
+            Title = Title,
             Categories = _db.Categories.ToList(),
+            
             Products = productsQuery.ToList()
         };
         return View(HomePage);;
