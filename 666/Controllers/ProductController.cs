@@ -45,6 +45,7 @@ public class ProductController : Controller
             Categories = _db.Categories.ToList(),
             Products = _db.Products.ToList()
         };
+        
         return View(HomePage);
     }
     [Authorize]
@@ -93,15 +94,29 @@ public class ProductController : Controller
             Category = product.Category.Title ,
             Id = id
         }; 
-        
         return View(newProduct);
     }
     [HttpPost]
     public IActionResult Delete(int id)
     {
-        var product = _db.Products.FirstOrDefault(u => u.Id == id);
+        
+        var product = _db.Products.Include(u => u.Category).FirstOrDefault(x => x.Id == id);
+        var title = product.Category.Title;
         _db.Products.Remove(product);
         _db.SaveChanges();
+        var oldproduct = _db.Products.Include(u=>u.Category).FirstOrDefault(x => x.Category.Title == title);
+        if (oldproduct == null)
+        {
+    
+           var category = _db.Categories.FirstOrDefault(x => x.Title == product.Category.Title);
+            _db.Categories.Remove(category);
+            _db.SaveChanges();
+        }
+        
+        
+       
+                
+        
         return RedirectToAction("Index");
     }
 
@@ -112,18 +127,27 @@ public class ProductController : Controller
         
         if (ModelState.IsValid)
         {
-            var product = _db.Products.Include(u=>u.Category).FirstOrDefault(x => x.Category.Title == viewModel.Category);
+            var category = _db.Categories.FirstOrDefault(x => x.Title == viewModel.Category);
+            var product = _db.Products.Include(u=>u.Category).FirstOrDefault(x => x.Id == viewModel.Id);
 
-            if (product == null)
+            if (category == null)
             {
-                _db.Categories.Add(new Category(){Title = viewModel.Category});
+                 var oldproduct = _db.Products.Include(u=>u.Category).FirstOrDefault(x => x.Category.Title == product.Category.Title);
+                 if (oldproduct == null)
+                 {
+
+                     category = _db.Categories.FirstOrDefault(x => x.Title == product.Category.Title);
+                     _db.Categories.Remove(category);
+                     _db.SaveChanges();
+                 }
+                
             }
             product = _db.Products.FirstOrDefault(x => x.Id == viewModel.Id);
 
                 product.Name = viewModel.Name;
                 product.Price = viewModel.Price;
                 product.Weight = viewModel.Weight;
-                product.Category = new Category() { Title = viewModel.Category };
+                product.Category.Title =viewModel.Category ;
             _db.SaveChanges();
             return RedirectToAction("Index");
         }

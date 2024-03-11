@@ -1,0 +1,24 @@
+﻿@model IEnumerable<User>
+
+<table class="table table-striped">
+         <thead class="thead-dark">
+         
+         <tr>
+             <th>Имя</th>
+             <th>Роль </th>
+             <th></th>
+             <th></th>
+         </tr>
+         </thead>
+         <tbody>
+         @{
+             foreach (var obj in Model)
+             {
+                 <tr>
+                     <td>@obj.Login</td>
+                     <td> @obj.Role.Title</td>
+                 </tr>
+             }
+         }
+         </tbody>
+     </table>
