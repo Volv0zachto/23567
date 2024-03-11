@@ -5,12 +5,16 @@
         <div class="form-group d-flex gap-3">
             <label for="categorySelect">Выбрать категорию:</label>
             <select id="categorySelect" name="Title" class="form-control">
-                <option value="">Категории</option>
+                <option value="">@Model.Title</option>
                 
                 @foreach (var category in Model.Categories)
                 {
-                    <option value="@category.Title">@category.Title</option>
+                    @if(Model.Title!=category.Title)
+                    {
+                        <option value="@category.Title">@category.Title</option>
+                    }
                 }
+                    
                 
             </select>
             <button type="submit" class="btn btn-primary ">Поиск</button>
