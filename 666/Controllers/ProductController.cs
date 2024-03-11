@@ -56,23 +56,23 @@ public class ProductController : Controller
 
     [HttpPost]
 
-    public IActionResult Add(ProductViewModel product)
+    public IActionResult Add(ProductViewModel viewModel)
     {
         if (ModelState.IsValid)
         {
-            var category = _db.Categories.FirstOrDefault(x => x.Title == product.Category);
+            var category = _db.Categories.FirstOrDefault(x => x.Title == viewModel.Category);
             if (category == null)
             {
-                category = new Category() { Title = product.Category };
+                category = new Category() { Title = viewModel.Category };
                 _db.Categories.Add(category);
                 _db.SaveChanges();
             }
 
             var newProduct = new Product()
             {
-                Name = product.Name,
-                Price = product.Price,
-                Weight = product.Weight,
+                Name = viewModel.Name,
+                Price = viewModel.Price,
+                Weight = viewModel.Weight,
                 Category = category 
             };
             _db.Products.Add(newProduct);
@@ -80,7 +80,7 @@ public class ProductController : Controller
             return RedirectToAction("Index");
         }
 
-        return View(product);
+        return View(viewModel);
     }
     [Authorize]
     public IActionResult Edit(int id)
@@ -127,27 +127,37 @@ public class ProductController : Controller
         
         if (ModelState.IsValid)
         {
+            var product = _db.Products.Include(u => u.Category).FirstOrDefault(x => x.Id == viewModel.Id);
+            var title = product.Category.Title;
             var category = _db.Categories.FirstOrDefault(x => x.Title == viewModel.Category);
-            var product = _db.Products.Include(u=>u.Category).FirstOrDefault(x => x.Id == viewModel.Id);
-
             if (category == null)
             {
-                 var oldproduct = _db.Products.Include(u=>u.Category).FirstOrDefault(x => x.Category.Title == product.Category.Title);
-                 if (oldproduct == null)
-                 {
-
-                     category = _db.Categories.FirstOrDefault(x => x.Title == product.Category.Title);
-                     _db.Categories.Remove(category);
-                     _db.SaveChanges();
-                 }
+                var newcategory = new Category() { Title = viewModel.Category };
+                _db.Categories.Add(newcategory);
+                _db.SaveChanges();
                 
+                product.Category = newcategory;
+                _db.SaveChanges();
             }
-            product = _db.Products.FirstOrDefault(x => x.Id == viewModel.Id);
+            else
+            {
+                product.Category = category;
+                _db.SaveChanges();
+            } 
+            
+            var oldproduct = _db.Products.Include(u=>u.Category).FirstOrDefault(x => x.Category.Title == title);
+            if (oldproduct == null)
+            {
+    
+                 category = _db.Categories.FirstOrDefault(x => x.Title == title);
+                _db.Categories.Remove(category);
+                _db.SaveChanges();
+            }
 
-                product.Name = viewModel.Name;
-                product.Price = viewModel.Price;
-                product.Weight = viewModel.Weight;
-                product.Category.Title =viewModel.Category ;
+            product.Name = viewModel.Name;
+            product.Price = viewModel.Price;
+            product.Weight = viewModel.Weight;
+            
             _db.SaveChanges();
             return RedirectToAction("Index");
         }
