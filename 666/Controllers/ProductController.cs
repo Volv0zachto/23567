@@ -117,10 +117,6 @@ public class ProductController : Controller
             _db.SaveChanges();
         }
         
-        
-       
-                
-        
         return RedirectToAction("Index");
     }
 
