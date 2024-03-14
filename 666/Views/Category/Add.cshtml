@@ -1,0 +1,26 @@
+@model Category
+
+
+
+<form asp-controller="Category" asp-action="Add" method="post" class="mt-4">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-secondary text-white">
+                        <h3 class="mb-0">Добавление категории</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="Category">Название</label>
+                            <input type="text" id="Title" name="Title" class="form-control" asp-for="Title" />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+                      
+                        <button type="submit" class="btn btn-primary">Добавить</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
